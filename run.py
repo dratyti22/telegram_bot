@@ -18,7 +18,7 @@ async def main():
     load_dotenv()
     bot = Bot(token=os.getenv('TOKEN'))
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
-    dp = Dispatcher()
+    dp = Dispatcher(skip_updates=True)
 
     dp.startup.register(starting_bot)
     dp.shutdown.register(stop_bot)
