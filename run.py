@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import logging
 import os
 import asyncio
-from core.handlers import basic, reaction_to_buttons
+from core.handlers import basic, reaction_to_buttons, a_or_b
 
 
 async def starting_bot(bot: Bot):
@@ -23,7 +23,7 @@ async def main():
     dp.startup.register(starting_bot)
     dp.shutdown.register(stop_bot)
 
-    dp.include_routers(basic.router, reaction_to_buttons.router)
+    dp.include_routers(basic.router, reaction_to_buttons.router, a_or_b.router)
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)

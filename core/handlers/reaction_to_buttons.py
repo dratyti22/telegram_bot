@@ -23,7 +23,8 @@ async def get_help(message: Message):
 
 @router.message(F.text == '⚙️ профиль')
 async def get_profile(message: Message):
-    await message.answer(f'ваш id: {message.from_user.id}')
+    await message.answer(f'ваш баланс =\n'
+        f'ваш id: {message.from_user.id}')
 
 
 @router.callback_query()
