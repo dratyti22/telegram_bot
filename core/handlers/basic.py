@@ -2,7 +2,7 @@ from aiogram import Router, F, Bot
 from aiogram.types import Message
 from aiogram.filters import Command
 from core.keyboards.reply import start_reply, admin_reply, admin_panel_reply
-from core.database.db import db_start, cmd_start_db
+from core.database.db import cmd_start_db
 
 from dotenv import load_dotenv
 import os
@@ -13,7 +13,6 @@ router = Router()
 
 @router.message(Command('start'))
 async def start_bot(message: Message, bot: Bot):
-    await db_start()
     await cmd_start_db(message.from_user.id)
     await message.answer(
         text=f'Добро пожаловать, {message.from_user.full_name}!\n'

@@ -8,12 +8,12 @@ router = Router()
 
 @router.message(F.text == '🛒 каталог')
 async def get_basket(message: Message):
-    await message.answer('Товары:', reply_markup=get_products())  # inline клавиатура с коваром)
+    await message.answer('Товары:', reply_markup=get_products())  # inline клавиатура с коваром
 
 
 @router.message(F.text == '💲 купить')
 async def get_buy(message: Message):
-    await message.answer('товар нету')  # inline клавиатура с коваром)
+    await message.answer('товар нету')  # inline клавиатура с коваром
 
 
 @router.message(F.text == '❓  помощь')
