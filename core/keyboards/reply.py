@@ -25,6 +25,7 @@ def admin_reply():
 
 def admin_panel_reply():
     kb = ReplyKeyboardBuilder()
+    kb.button(text='главное меню')
     kb.button(text='добавить товар')
     kb.button(text='удалить товар')
     kb.button(text='сделать рассылку')
@@ -35,5 +36,15 @@ def help_reply():
     kb = ReplyKeyboardBuilder()
     kb.button(text='админ')
     kb.button(text='назад')
+    kb.button(text='главное меню')
     kb.adjust(1, 1)
+    return kb.as_markup(resize_keyboard=True)
+
+
+def profile_users():
+    kb = ReplyKeyboardBuilder()
+    kb.button(text='главное меню')
+    kb.button(text='ввести купон')
+    kb.button(text='пополнить баланс')
+    kb.adjust(1, 2)
     return kb.as_markup(resize_keyboard=True)

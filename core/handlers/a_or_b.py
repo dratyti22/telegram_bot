@@ -15,7 +15,6 @@ class MainStates(StatesGroup):
 
 @router.message(Command('a_or_b'))
 async def a_or_b(message: Message, state: FSMContext):
-
     # Отправляем сообщение с клавиатурой выбора кнопок A и B
     msg = await message.reply(text='Выберите кнопку A или B', reply_markup=a_or_b_inline())
 
@@ -27,9 +26,9 @@ async def a_or_b(message: Message, state: FSMContext):
 
 
 @router.callback_query(MainStates.MENU)
-async def process_callback_menu(callback_query: CallbackQuery, state: FSMContext, bot: Bot):
-    if callback_query.data == 'button_a':
-        await bot.answer_callback_query(callback_query.id, text="Вы выбрали A")
+async def process_callback_menu(callback: CallbackQuery, state: FSMContext, bot: Bot):
+    if callback.data == 'button_a':
+        await bot.answer_callback_query(callback_query_id=callback.id, text="Вы выбрали A")
         # Выполняем какие-то действия при выборе кнопки A
 
         # Устанавливаем состояние, в котором находимся (ACTION_A)
@@ -37,16 +36,18 @@ async def process_callback_menu(callback_query: CallbackQuery, state: FSMContext
 
         # Отправляем сообщение с текстом и клавиатурой для выбора кнопки
         message_id = (await state.get_data()).get('msg_id')
-        await bot.edit_message_text('Подтвердите выбор', message_id, reply_markup=a_or_b_inline_next())
+        await bot.edit_message_text(chat_id=callback.from_user.id, text='Подтвердите выбор', message_id=message_id,
+                                    reply_markup=a_or_b_inline_next())
 
-    elif callback_query.data == 'button_b':
-        await bot.answer_callback_query(callback_query.id, text="Вы выбрали B")
+    elif callback.data == 'button_b':
+        await bot.answer_callback_query(callback_query_id=callback.id, text="Вы выбрали B")
 
         # Выполняем какие-то действия при выборе кнопки B
 
         # Отправляем сообщение с текстом и клавиатурой для выбора кнопки
         message_id = (await state.get_data()).get('msg_id')
-        await bot.edit_message_text('Подтвердите выбор', message_id, reply_markup=a_or_b_inline_next())
+        await bot.edit_message_text(chat_id=callback.from_user.id, text='Подтвердите выбор', message_id=message_id,
+                                    reply_markup=a_or_b_inline_next())
 
 
 @router.callback_query(F.text == 'back', MainStates.ACTION_A, MainStates.ACTION_B)
