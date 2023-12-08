@@ -1,58 +1,62 @@
 # пока используется sqllite3, но потом перенесу на psypg2
 import sqlite3 as sq
 
-db = sq.connect('tg.db')
-cur = db.cursor()
+conn = sq.connect('text_prices.db')
+cursor = conn.cursor()
 
 
-async def cmd_start_db(user_id):
-    user = cur.execute("SELECT * FROM accounts WHERE tg_id == {key}".format(key=user_id)).fetchone()
-    if not user:
-        cur.execute("INSERT INTO accounts (tg_id) VALUES ({key})".format(key=user_id))
-        db.commit()
+async def create_database_prices_text():
+    # Создаем таблицу для текста и цены
+    cursor.execute('''CREATE TABLE IF NOT EXISTS text_prices
+                      (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                       text TEXT NOT NULL,
+                       price REAL NOT NULL)''')
+
+    conn.commit()
+    print("База данных создана")
 
 
-async def create_user_id_and_balance(user_id):
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            {user_id} INTEGER PRIMARY KEY,
-            balance INTEGER
-        )
-    '''.format(user_id=user_id))
-    db.commit()
-    db.close()
-    print("подключена база данных")
+# Функция для добавления новой записи в базу данных
+async def add_entry(text, price):
+    # Получаем максимальное значение идентификатора и увеличиваем его на 1 для новой записи
+    cursor.execute("SELECT MAX(id) FROM text_prices")
+    max_id = cursor.fetchone()[0]
+    new_id = max_id + 1 if max_id else 1
+
+    cursor.execute("INSERT INTO text_prices (id, text, price) VALUES (?, ?, ?)", (new_id, text, price))
+    print("Товар добавлен в базу данных")
+    conn.commit()
 
 
-async def add_balance(user_id, amount):
-    # Получаем текущий баланс пользователя
-    cur.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-    current_balance = cur.fetchone()[0]
+# Функция для удаления записи из базы данных
+async def delete_entry(entry_id):
 
-    # Прибавляем сумму к текущему балансу
-    new_balance = current_balance + amount
+    cursor.execute("DELETE FROM text_prices WHERE id=?", (entry_id,))
 
-    # Обновляем баланс в базе данных
-    cur.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
-    db.commit()
-    db.close()
-    print("база данных для пополнения подключенна")
+    # Уменьшаем значения идентификаторов всех последующих записей
+    cursor.execute("UPDATE text_prices SET id = id - 1 WHERE id > ?", (entry_id,))
+
+    # Сохраняем изменения в базе данных
+    conn.commit()
 
 
-async def subtract_balance(user_id, amount):
-    # Получаем текущий баланс пользователя
-    cur.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-    current_balance = cur.fetchone()[0]
-    print("База данных для вычета включенна")
+async def display_entries_admin():
+    entries = []
+    cursor.execute("SELECT id, text, price FROM text_prices")
 
-    # Проверяем, достаточно ли средств на балансе для вычета
-    if current_balance >= amount:
-        new_balance = current_balance - amount
-        # Обновляем баланс в базе данных
-        cur.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
-        db.commit()
-        db.close()
-        return True
-    else:
-        db.close()
-        return False
+    for entry in cursor.fetchall():
+        entries.append(entry)
+
+    conn.commit()
+    return entries
+
+
+async def display_entries_user():
+    entries = []
+    cursor.execute("SELECT text, price FROM text_prices")
+
+    for entry in cursor.fetchall():
+        entries.append(entry)
+
+    conn.commit()
+    return entries
