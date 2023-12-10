@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 import logging
 import os
 import asyncio
-from core.handlers import basic, reaction_to_buttons, a_or_b
+from core.handlers import basic, reaction_to_buttons
+from core.experiment import a_or_b, a_or_b2, increased_message_limit
 
 
 async def starting_bot(bot: Bot):
@@ -18,12 +19,13 @@ async def main():
     load_dotenv()
     bot = Bot(token=os.getenv('TOKEN'))
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(name)s - %(message)s')
-    dp = Dispatcher(skip_updates=True)
+    dp = Dispatcher()
 
     dp.startup.register(starting_bot)
     dp.shutdown.register(stop_bot)
 
-    dp.include_routers(basic.router, reaction_to_buttons.router, a_or_b.router)
+    dp.include_routers(basic.router, reaction_to_buttons.router, a_or_b.router, a_or_b2.router,
+                       increased_message_limit.router)
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)

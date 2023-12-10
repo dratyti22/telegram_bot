@@ -1,49 +1,56 @@
 import sqlite3 as sq
-db = sq.connect('tg.db')
-cur = db.cursor()
+
+conn = sq.connect('tg.db')
+cursor = conn.cursor()
 
 
 async def create_user_id_and_balance(user_id):
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            {user_id} INTEGER PRIMARY KEY,
-            balance INTEGER
-        )
-    '''.format(user_id=user_id))
-    db.commit()
-    db.close()
-    print("подключена база данных")
+    cursor.execute('''
+         CREATE TABLE IF NOT EXISTS users (
+             user_id INTEGER PRIMARY KEY,
+             balance INTEGER
+         )
+     ''')
+    conn.commit()
+
+    cursor.execute('SELECT user_id FROM users WHERE user_id = ?', (user_id,))
+    existing_user = cursor.fetchone()
+
+    if existing_user is None:
+        cursor.execute('INSERT INTO users (user_id, balance) VALUES (?, ?)', (user_id, 0,))
+        conn.commit()
 
 
 async def add_balance(user_id, amount):
     # Получаем текущий баланс пользователя
-    cur.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-    current_balance = cur.fetchone()[0]
+    cursor.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
+    cursor_balance = cursor.fetchone()[0]
 
     # Прибавляем сумму к текущему балансу
-    new_balance = current_balance + amount
+    new_balance = cursor_balance + amount
 
     # Обновляем баланс в базе данных
-    cur.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
-    db.commit()
-    db.close()
-    print("база данных для пополнения подключенна")
+    cursor.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
+    conn.commit()
+    print("база данных для пополнения подключена")
 
 
 async def subtract_balance(user_id, amount):
     # Получаем текущий баланс пользователя
-    cur.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
-    current_balance = cur.fetchone()[0]
-    print("База данных для вычета включенна")
+    cursor.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
+    cursor_balance = cursor.fetchone()[0]
+    print("База данных для вычета включена")
 
     # Проверяем, достаточно ли средств на балансе для вычета
-    if current_balance >= amount:
-        new_balance = current_balance - amount
+    if cursor_balance >= amount:
+        new_balance = cursor_balance - amount
         # Обновляем баланс в базе данных
-        cur.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
-        db.commit()
-        db.close()
-        return True
-    else:
-        db.close()
-        return False
+        cursor.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
+        conn.commit()
+
+
+async def display_balance(user_id: int):
+    cursor.execute("SELECT balance, user_id FROM users WHERE user_id = ?", (user_id,))
+    entry = cursor.fetchone()
+    conn.commit()
+    return entry
