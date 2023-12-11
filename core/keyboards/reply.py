@@ -29,13 +29,14 @@ def admin_panel_reply():
     kb.button(text='добавить товар')
     kb.button(text='удалить товар')
     kb.button(text='сделать рассылку')
+    kb.button(text='Посмотреть все товары')
+    kb.adjust(1)
     return kb.as_markup(resize_keyboard=True)
 
 
 def help_reply():
     kb = ReplyKeyboardBuilder()
     kb.button(text='админ')
-    kb.button(text='назад')
     kb.button(text='главное меню')
     kb.adjust(1, 1)
     return kb.as_markup(resize_keyboard=True)

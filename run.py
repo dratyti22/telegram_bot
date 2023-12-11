@@ -4,7 +4,7 @@ import logging
 import os
 import asyncio
 from core.handlers import basic, reaction_to_buttons
-from core.experiment import a_or_b, a_or_b2, increased_message_limit
+from core.experiment import a_or_b, a_or_b2, increased_message_limit, increased_message_limit2
 
 
 async def starting_bot(bot: Bot):
@@ -24,8 +24,9 @@ async def main():
     dp.startup.register(starting_bot)
     dp.shutdown.register(stop_bot)
 
-    dp.include_routers(basic.router, reaction_to_buttons.router, a_or_b.router, a_or_b2.router,
-                       increased_message_limit.router)
+    dp.include_routers(basic.router, reaction_to_buttons.router)
+    dp.include_routers(a_or_b.router, a_or_b2.router,
+                       increased_message_limit.router, increased_message_limit2.router)
 
     try:
         await bot.delete_webhook(drop_pending_updates=True)
