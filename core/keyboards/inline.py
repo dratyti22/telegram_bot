@@ -33,6 +33,15 @@ def message_limit_inline_back(page: int, num_pages: int):
     return kb
 
 
+def message_limit_inline_past(page: int, num_pages: int):
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text='назад', callback_data='back'),
+            InlineKeyboardButton(text=f'страница {page}/{num_pages}', callback_data='current_page')
+        ]
+    ])
+
+
 async def get_products_inline():
     entries = await display_entries_admin()
     kb = InlineKeyboardMarkup(inline_keyboard=[
