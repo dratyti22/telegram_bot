@@ -1,5 +1,6 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from core.database.db import display_entries_admin
 
 
 def payment_inline() -> InlineKeyboardMarkup:
@@ -11,37 +12,35 @@ def payment_inline() -> InlineKeyboardMarkup:
     return keyboard
 
 
-def products_next_inline1():
+def message_limit_inline_next(page: int, num_pages: int):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text='Далее', callback_data='next1'),
-            InlineKeyboardButton(text=f'страница {1}|3', callback_data='next1')
+            InlineKeyboardButton(text='Далее', callback_data='next'),
+            InlineKeyboardButton(text=f'страница {page}/{num_pages}', callback_data='current_page')
         ]
     ])
     return kb
 
 
-def products_further_inline1():
+def message_limit_inline_back(page: int, num_pages: int):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text='назад', callback_data='further'),
-            InlineKeyboardButton(text=f'страница {2}/3', callback_data='further')
+            InlineKeyboardButton(text='назад', callback_data='back'),
+            InlineKeyboardButton(text=f'страница {page}/{num_pages}', callback_data='current_page'),
+            InlineKeyboardButton(text='далее', callback_data='next')
         ]
     ])
     return kb
 
 
-# def products_further_inline1()
-
-
-def get_products():
-    kb = InlineKeyboardBuilder()
-    kb.button(text='шорты', callback_data='short')
-    kb.button(text='ботинки', callback_data='boots')
-    kb.button(text='кроссовки', callback_data='sneakers')
-    kb.button(text='майка', callback_data='cap')
-    kb.adjust(2)
-    return kb.as_markup()
+async def get_products_inline():
+    entries = await display_entries_admin()
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text=entry[1], callback_data=f'product_{entry[0]}'),
+        ] for entry in entries
+    ])
+    return kb
 
 
 def a_or_b_inline():

@@ -30,7 +30,7 @@ def admin_panel_reply():
     kb.button(text='удалить товар')
     kb.button(text='сделать рассылку')
     kb.button(text='Посмотреть все товары')
-    kb.adjust(1)
+    kb.adjust(1, 2, 1, 1)
     return kb.as_markup(resize_keyboard=True)
 
 
