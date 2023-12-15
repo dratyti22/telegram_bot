@@ -28,12 +28,12 @@ async def start_bot(message: Message, bot: Bot):
         text=f'Добро пожаловать, {message.from_user.full_name}!\n'
              f'Это магазин чего то либо'
     )
-    await message.answer(f'Главное меню', reply_markup=start_reply())
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
         await command_admin(bot)
         await message.answer('Ты зашел как админ', reply_markup=admin_reply())
     else:
         await command_user(bot)
+        await message.answer(f'Главное меню', reply_markup=start_reply())
 
 
 @router.message(F.text == 'админ панель')
