@@ -22,17 +22,12 @@ async def create_user_id_and_balance(user_id):
 
 
 async def add_balance(user_id, amount):
-    # Получаем текущий баланс пользователя
     cursor.execute("SELECT balance FROM users WHERE user_id=?", (user_id,))
     cursor_balance = cursor.fetchone()[0]
-
-    # Прибавляем сумму к текущему балансу
     new_balance = cursor_balance + amount
-
-    # Обновляем баланс в базе данных
     cursor.execute("UPDATE users SET balance=? WHERE user_id=?", (new_balance, user_id))
     conn.commit()
-    print("база данных для пополнения подключена")
+    print("База данных для пополнения подключена")
 
 
 async def subtract_balance(user_id, amount):

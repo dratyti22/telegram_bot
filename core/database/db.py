@@ -13,7 +13,6 @@ async def create_database_prices_text():
                        price REAL NOT NULL)''')
 
     conn.commit()
-    print("База данных создана")
 
 
 # Функция для добавления новой записи в базу данных
@@ -60,3 +59,10 @@ async def display_entries_user():
 
     conn.commit()
     return entries
+
+
+async def display_price(product_id):
+    cursor.execute("SELECT price FROM text_prices WHERE id=?", (product_id,))
+    price = cursor.fetchone()[0]
+    conn.commit()
+    return price
