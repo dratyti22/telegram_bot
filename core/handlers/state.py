@@ -19,3 +19,7 @@ class AddProductsAdminState(StatesGroup):
 
 class DeletedProductsAdminState(StatesGroup):
     NUMBER = State()
+
+
+class TextMailingListState(StatesGroup):
+    TEXT = State()
