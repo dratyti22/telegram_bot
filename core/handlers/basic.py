@@ -23,9 +23,9 @@ router = Router()
 
 @router.message(Command('start'))
 async def start_bot(message: Message, bot: Bot):
-    await cmd_start_db(message.from_user.id),
     await create_database_prices_text()
     await create_user_id_and_balance(message.from_user.id)
+    await cmd_start_db(message.from_user.id)
     await create_coupons()
     await message.answer(
         text=f'Добро пожаловать, {message.from_user.full_name}!\n'

@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 def start_reply():
     kb = ReplyKeyboardBuilder()
-    kb.button(text='🛒 корзина')
+    kb.button(text='🛒 каталог')
     kb.button(text='💲 купить')
     kb.button(text='❓  помощь')
     kb.button(text='⚙️ профиль')

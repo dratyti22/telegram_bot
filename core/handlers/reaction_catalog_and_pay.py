@@ -44,39 +44,41 @@ async def get_basket1(message: Message, state: FSMContext):
 
     user_length = len(entries_list_user)
     admin_length = len(entries_list_admin)
+    if user_length > 1 and admin_length > 1:
+        if message.from_user.id == int(os.getenv('ADMIN_ID')):
+            if admin_length > 4096:
+                num_pages = math.ceil(admin_length / 4096)
+                message_admin = [entries_list_admin[i:i + 4096] for i in range(0, admin_length, 4096)]
 
-    if message.from_user.id == int(os.getenv('ADMIN_ID')):
-        if admin_length > 4096:
-            num_pages = math.ceil(admin_length / 4096)
-            message_admin = [entries_list_admin[i:i + 4096] for i in range(0, admin_length, 4096)]
+                await state.update_data(
+                    packages=message_admin,
+                    current_page=0
+                )
 
-            await state.update_data(
-                packages=message_admin,
-                current_page=0
-            )
-
-            await message.answer(
-                text=message_admin[0],
-                reply_markup=message_limit_inline_next(1, num_pages)
-            )
+                await message.answer(
+                    text=message_admin[0],
+                    reply_markup=message_limit_inline_next(1, num_pages)
+                )
+            else:
+                await message.answer(text=entries_list_admin)
         else:
-            await message.answer(text=entries_list_admin)
+            if user_length > 4096:
+                num_pages = math.ceil(user_length / 4096)
+                message_user = [entries_list_user[i:i + 4096] for i in range(0, user_length, 4096)]
+
+                await state.update_data(
+                    packages=message_user,
+                    current_page=0
+                )
+
+                await message.answer(
+                    text=message_user[0],
+                    reply_markup=message_limit_inline_next(1, num_pages)
+                )
+            else:
+                await message.answer(text=entries_list_user)
     else:
-        if user_length > 4096:
-            num_pages = math.ceil(user_length / 4096)
-            message_user = [entries_list_user[i:i + 4096] for i in range(0, user_length, 4096)]
-
-            await state.update_data(
-                packages=message_user,
-                current_page=0
-            )
-
-            await message.answer(
-                text=message_user[0],
-                reply_markup=message_limit_inline_next(1, num_pages)
-            )
-        else:
-            await message.answer(text=entries_list_user)
+        await message.answer(text='Нету товаров')
 
 
 @router.callback_query(F.data == 'next')
