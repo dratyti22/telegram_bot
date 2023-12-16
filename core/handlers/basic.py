@@ -14,6 +14,8 @@ from core.handlers.state import TOPUPYOURBALANCESTATE, AddProductsAdminState, De
 from core.database.db_balance_user import create_user_id_and_balance, add_balance, display_balance
 from core.keyboards.inline import payment_inline
 from core.handlers.pay import payment_for_the_purchase
+from core.database.db_coupons import create_coupons, add_coupons, deleted_coupons, display_coupons
+from core.handlers.state import AddCouponsState, DeletedCouponsState
 
 load_dotenv()
 router = Router()
@@ -24,32 +26,77 @@ async def start_bot(message: Message, bot: Bot):
     await cmd_start_db(message.from_user.id),
     await create_database_prices_text()
     await create_user_id_and_balance(message.from_user.id)
+    await create_coupons()
     await message.answer(
         text=f'Добро пожаловать, {message.from_user.full_name}!\n'
              f'Это магазин чего то либо'
     )
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
-        await command_admin(bot)
         await message.answer('Ты зашел как админ', reply_markup=admin_reply())
+        await command_admin(bot)
     else:
-        await command_user(bot)
         await message.answer(f'Главное меню', reply_markup=start_reply())
+        await command_user(bot)
 
 
-@router.message(F.text == 'админ панель')
-async def admin_settings(message: Message):
-    await message.reply(
-        text='Админ панель для настроек', reply_markup=admin_panel_reply())
+@router.message(F.text == 'Создать купон')
+async def create_add_coupons(message: Message, state: FSMContext):
+    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+        await message.answer(text='Введите название купона:')
+        await state.set_state(AddCouponsState.NAME)
 
 
-@router.message(F.text == '❓  помощь')
-async def get_help(message: Message):
-    await message.answer('связь', reply_markup=help_reply())
+@router.message(AddCouponsState.NAME)
+async def add_coupons_name(message: Message, state: FSMContext):
+    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+        await state.update_data(name=message.text)
+        await message.answer(text='Введите цену купона в рублях:')
+        await state.set_state(AddCouponsState.PRICE)
 
 
-@router.message(F.text == 'админ')
-async def get_help_admins(message: Message):
-    await message.answer(text='Что бы спросить у админа напишите ему.\n@user_nameeeeeeeeeeee')
+@router.message(AddCouponsState.PRICE)
+async def add_coupons_price(message: Message, state: FSMContext):
+    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+        await state.update_data(price=message.text)
+        await message.answer(text='Теперь напишите кол-во купонов:')
+        await state.set_state(AddCouponsState.QUANTITY)
+
+
+@router.message(AddCouponsState.QUANTITY)
+async def add_coupons_quantity(message: Message, state: FSMContext):
+    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+        await state.update_data(quantity=message.text)
+        data = await state.get_data()
+        await add_coupons(str(data['name']), int(data['price']), int(data['quantity']))
+        await message.answer(text='Купоны созданы')
+        await state.clear()
+
+
+@router.message(F.text == 'Удалить купон')
+async def deleted_coupons_number(message: Message, state: FSMContext):
+    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+        await message.answer(text='Введите id купона:')
+        await state.set_state(DeletedCouponsState.ID)
+
+
+@router.message(DeletedCouponsState.ID)
+async def deleted_coupons_id(message: Message, state: FSMContext):
+    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+        await state.update_data(id=message.text)
+        data = await state.get_data()
+        await deleted_coupons(int(data['id']))
+        await message.answer(text='Купон удален')
+        await state.clear()
+
+
+@router.message(F.text == 'Посмотреть все купоны')
+async def display_coupons_admin(message: Message):
+    entries = await display_coupons()
+    if entries:
+        text = '\n'.join(f'id: {entry[0]} name: {entry[1]} price: {entry[2]} quantity: {entry[3]}' for entry in entries)
+        await message.answer(text=text)
+    else:
+        await message.answer(text='Купонов нет')
 
 
 @router.message(F.text == '⚙️ профиль')

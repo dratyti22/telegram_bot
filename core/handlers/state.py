@@ -23,3 +23,17 @@ class DeletedProductsAdminState(StatesGroup):
 
 class TextMailingListState(StatesGroup):
     TEXT = State()
+
+
+class AddCouponsState(StatesGroup):
+    NAME = State()
+    PRICE = State()
+    QUANTITY = State()
+
+
+class DeletedCouponsState(StatesGroup):
+    ID = State()
+
+
+class TitleState(StatesGroup):
+    TITLE = State()

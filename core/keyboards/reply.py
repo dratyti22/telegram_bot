@@ -28,9 +28,12 @@ def admin_panel_reply():
     kb.button(text='главное меню')
     kb.button(text='добавить товар')
     kb.button(text='удалить товар')
-    kb.button(text='сделать рассылку')
     kb.button(text='Посмотреть все товары')
-    kb.adjust(1, 2, 1, 1)
+    kb.button(text='сделать рассылку')
+    kb.button(text='Создать купон')
+    kb.button(text='Удалить купон')
+    kb.button(text='Посмотреть все купоны')
+    kb.adjust(1, 3, 1, 3)
     return kb.as_markup(resize_keyboard=True)
 
 
